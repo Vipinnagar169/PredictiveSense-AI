@@ -30,26 +30,27 @@ multivariate sensor data from industrial and defence-grade equipment to:
 
 ---
 
+
+````markdown
 ## 🏗️ Project Structure
 
-PredictiveSense-AI/
-├── data/
-│   ├── raw/              # NASA C-MAPSS raw dataset
-│   └── processed/        # Cleaned & ML-ready data
-├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_feature_engineering.ipynb
-│   ├── 03_model_training.ipynb
-│   ├── 04_model_improvement.ipynb
-│   └── 05_anomaly_detection.ipynb
-├── models/               # Saved ML models
-├── src/                  # Python scripts
-├── dashboard/            # Streamlit app (upcoming)
-├── .gitignore
-├── requirements.txt
-└── README.md
-
----
+    PredictiveSense-AI/
+    ├── data/
+    │   ├── raw/              # NASA C-MAPSS raw dataset
+    │   └── processed/        # Cleaned & ML-ready data
+    ├── notebooks/
+    │   ├── 01_data_exploration.ipynb
+    │   ├── 02_feature_engineering.ipynb
+    │   ├── 03_model_training.ipynb
+    │   ├── 04_model_improvement.ipynb
+    │   └── 05_anomaly_detection.ipynb
+    ├── models/               # Saved ML models
+    ├── src/                  # Python scripts
+    ├── dashboard/            # Streamlit app (upcoming)
+    ├── .gitignore
+    ├── requirements.txt
+    └── README.md
+````
 
 ## ⚙️ Tech Stack
 | Technology | Purpose |
