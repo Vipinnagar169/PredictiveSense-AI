@@ -50,12 +50,6 @@ multivariate sensor data from industrial and defence-grade equipment to:
 
 ---
 
-### 5. Control Panel — Engine & Sensor Selection
-![Control Panel](screenshots/dashboard_control_panel.png)
-> Interactive sidebar with engine ID slider and sensor dropdown selector
-
----
-
 ## 📊 Dataset
 **NASA C-MAPSS Turbofan Engine Degradation Dataset**
 - 100 engines monitored from start to failure
