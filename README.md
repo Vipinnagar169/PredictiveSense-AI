@@ -72,6 +72,7 @@ multivariate sensor data from industrial and defence-grade equipment to:
 
 ## 🏗️ Project Structure
 
+```
 PredictiveSense-AI/
 ├── data/
 │   ├── raw/                        # NASA C-MAPSS raw dataset
@@ -105,8 +106,7 @@ PredictiveSense-AI/
 ├── .gitignore
 ├── requirements.txt
 └── README.md
-
----
+```
 
 ## ⚙️ Tech Stack
 | Technology | Purpose | Status |
