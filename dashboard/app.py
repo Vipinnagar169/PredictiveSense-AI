@@ -266,31 +266,55 @@ st.markdown("---")
 # ── Section 5 — Email Alert System ───────────────────────────────
 st.markdown("## 📧 Email Alert System")
 
-receiver_email = st.text_input("Enter Engineer Email for Alerts:", 
-                                placeholder="engineer@example.com")
+# Load saved email
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+config_path = os.path.join(BASE_DIR, 'src', 'config.txt')
 
+saved_email = ""
+if os.path.exists(config_path):
+    with open(config_path, 'r') as f:
+        saved_email = f.read().strip()
+
+# Email input
+receiver_email = st.text_input(
+    "Enter Engineer Email for Alerts:",
+    value=saved_email,
+    placeholder="engineer@example.com"
+)
+
+# Save email button
+col_save1, col_save2 = st.columns([1, 4])
+with col_save1:
+    if st.button("💾 Save Email"):
+        with open(config_path, 'w') as f:
+            f.write(receiver_email)
+        st.success(f"✅ Email saved: {receiver_email}")
+
+# Auto alert based on status
 if receiver_email:
+    sensor_value = engine_df[selected_sensor].iloc[-1]
+
     if status == "CRITICAL":
-        if st.button("🔴 Send Critical Alert Email"):
-            from src.email_alert import send_critical_alert
-            success = send_critical_alert(engine_id, predicted_rul, 
-                                         anomaly_count, receiver_email)
-            if success:
-                st.success(f"✅ Critical alert sent to {receiver_email}!")
-            else:
-                st.error("❌ Email failed — check App Password!")
-    
+        from src.email_alert import send_critical_alert
+        success = send_critical_alert(engine_id, predicted_rul,
+                             anomaly_count, receiver_email, 
+                             sensor_value, selected_sensor)
+        if success:
+            st.error(f"🔴 CRITICAL — Engine #{engine_id} may fail in {predicted_rul:.0f} cycles! Alert sent to {receiver_email}!")
+        else:
+            st.error("🔴 CRITICAL — Alert email failed to send!")
+
     elif status == "WARNING":
-        if st.button("🟡 Send Warning Alert Email"):
-            from src.email_alert import send_warning_alert
-            success = send_warning_alert(engine_id, predicted_rul, receiver_email)
-            if success:
-                st.success(f"✅ Warning alert sent to {receiver_email}!")
-            else:
-                st.error("❌ Email failed — check App Password!")
-    
+        from src.email_alert import send_warning_alert
+        success = send_warning_alert(engine_id, predicted_rul,
+                                    receiver_email, sensor_value)
+        if success:
+            st.warning(f"🟡 WARNING — Engine #{engine_id} RUL: {predicted_rul:.0f} cycles. Alert sent to {receiver_email}!")
+        else:
+            st.warning("🟡 WARNING — Alert email failed to send!")
+
     else:
-        st.info("🟢 Engine is HEALTHY — No alert needed!")
+        st.success("🟢 Engine is HEALTHY — No alert needed!")
 
 st.markdown("---")
 
