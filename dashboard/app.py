@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 st.set_page_config(
     page_title="PredictiveSense AI",
@@ -260,4 +262,36 @@ with col2:
         st.success("🟢 Low anomaly rate — normal operation")
 
 st.markdown("---")
+
+# ── Section 5 — Email Alert System ───────────────────────────────
+st.markdown("## 📧 Email Alert System")
+
+receiver_email = st.text_input("Enter Engineer Email for Alerts:", 
+                                placeholder="engineer@example.com")
+
+if receiver_email:
+    if status == "CRITICAL":
+        if st.button("🔴 Send Critical Alert Email"):
+            from src.email_alert import send_critical_alert
+            success = send_critical_alert(engine_id, predicted_rul, 
+                                         anomaly_count, receiver_email)
+            if success:
+                st.success(f"✅ Critical alert sent to {receiver_email}!")
+            else:
+                st.error("❌ Email failed — check App Password!")
+    
+    elif status == "WARNING":
+        if st.button("🟡 Send Warning Alert Email"):
+            from src.email_alert import send_warning_alert
+            success = send_warning_alert(engine_id, predicted_rul, receiver_email)
+            if success:
+                st.success(f"✅ Warning alert sent to {receiver_email}!")
+            else:
+                st.error("❌ Email failed — check App Password!")
+    
+    else:
+        st.info("🟢 Engine is HEALTHY — No alert needed!")
+
+st.markdown("---")
+
 st.caption("PredictiveSense AI | DRDO Internship 2026 | Vipin Nagar | github.com/Vipinnagar169/PredictiveSense-AI")
