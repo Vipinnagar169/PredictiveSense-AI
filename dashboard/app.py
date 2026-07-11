@@ -266,14 +266,38 @@ st.markdown("---")
 # ── Section 5 — Email Alert System ───────────────────────────────
 st.markdown("## 📧 Email Alert System")
 
-# Load saved email
+# DEMO_MODE: set to true only in Streamlit Cloud's Secrets settings.
+# Locally / in Docker this stays False automatically -> real email
+# sending works exactly as before, nothing changes for your demo/report.
+try:
+    DEMO_MODE = st.secrets.get("DEMO_MODE", False)
+except Exception:
+    DEMO_MODE = False
+
+def mask_email(email):
+    """abhixyz427@gmail.com -> ab******27@gmail.com"""
+    if "@" not in email:
+        return email
+    local, domain = email.split("@", 1)
+    if len(local) <= 4:
+        masked_local = local[0] + "*" * max(len(local) - 1, 1)
+    else:
+        masked_local = local[:2] + "*" * (len(local) - 4) + local[-2:]
+    return f"{masked_local}@{domain}"
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 config_path = os.path.join(BASE_DIR, 'src', 'config.txt')
 
-saved_email = ""
-if os.path.exists(config_path):
-    with open(config_path, 'r') as f:
-        saved_email = f.read().strip()
+if DEMO_MODE:
+    # Public cloud: email sirf is browser session mein rehta hai,
+    # disk pe kabhi save nahi hota, koi doosra visitor isse nahi dekhega.
+    saved_email = st.session_state.get("receiver_email", "")
+else:
+    # Local / Docker: bilkul original behaviour, kuch nahi badla.
+    saved_email = ""
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            saved_email = f.read().strip()
 
 # Email input
 receiver_email = st.text_input(
@@ -286,32 +310,45 @@ receiver_email = st.text_input(
 col_save1, col_save2 = st.columns([1, 4])
 with col_save1:
     if st.button("💾 Save Email"):
-        with open(config_path, 'w') as f:
-            f.write(receiver_email)
-        st.success(f"✅ Email saved: {receiver_email}")
+        if DEMO_MODE:
+            st.session_state["receiver_email"] = receiver_email
+            st.success(f"✅ Email saved for this session: {mask_email(receiver_email)}")
+        else:
+            with open(config_path, 'w') as f:
+                f.write(receiver_email)
+            st.success(f"✅ Email saved: {receiver_email}")
 
 # Auto alert based on status
 if receiver_email:
     sensor_value = engine_df[selected_sensor].iloc[-1]
+    display_email = mask_email(receiver_email) if DEMO_MODE else receiver_email
 
     if status == "CRITICAL":
-        from src.email_alert import send_critical_alert
-        success = send_critical_alert(engine_id, predicted_rul,
-                             anomaly_count, receiver_email, 
-                             sensor_value, selected_sensor)
-        if success:
-            st.error(f"🔴 CRITICAL — Engine #{engine_id} may fail in {predicted_rul:.0f} cycles! Alert sent to {receiver_email}!")
+        if DEMO_MODE:
+            st.error(f"🔴 CRITICAL — Engine #{engine_id} may fail in {predicted_rul:.0f} cycles! "
+                     f"Alert would be sent to {display_email} (demo mode — sending disabled on public link).")
         else:
-            st.error("🔴 CRITICAL — Alert email failed to send!")
+            from src.email_alert import send_critical_alert
+            success = send_critical_alert(engine_id, predicted_rul,
+                                 anomaly_count, receiver_email,
+                                 sensor_value, selected_sensor)
+            if success:
+                st.error(f"🔴 CRITICAL — Engine #{engine_id} may fail in {predicted_rul:.0f} cycles! Alert sent to {receiver_email}!")
+            else:
+                st.error("🔴 CRITICAL — Alert email failed to send!")
 
     elif status == "WARNING":
-        from src.email_alert import send_warning_alert
-        success = send_warning_alert(engine_id, predicted_rul,
-                                    receiver_email, sensor_value)
-        if success:
-            st.warning(f"🟡 WARNING — Engine #{engine_id} RUL: {predicted_rul:.0f} cycles. Alert sent to {receiver_email}!")
+        if DEMO_MODE:
+            st.warning(f"🟡 WARNING — Engine #{engine_id} RUL: {predicted_rul:.0f} cycles. "
+                       f"Alert would be sent to {display_email} (demo mode — sending disabled on public link).")
         else:
-            st.warning("🟡 WARNING — Alert email failed to send!")
+            from src.email_alert import send_warning_alert
+            success = send_warning_alert(engine_id, predicted_rul,
+                                        receiver_email, sensor_value)
+            if success:
+                st.warning(f"🟡 WARNING — Engine #{engine_id} RUL: {predicted_rul:.0f} cycles. Alert sent to {receiver_email}!")
+            else:
+                st.warning("🟡 WARNING — Alert email failed to send!")
 
     else:
         st.success("🟢 Engine is HEALTHY — No alert needed!")
