@@ -8,8 +8,8 @@
 ![Dashboard](https://img.shields.io/badge/Dashboard-Streamlit-red)
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 ![Internship](https://img.shields.io/badge/DRDO-Internship%202026-darkred)
-![R2 Score](https://img.shields.io/badge/R2%20Score-0.7949-blue)
-![RMSE](https://img.shields.io/badge/RMSE-18.66%20cycles-orange)
+![R2 Score](https://img.shields.io/badge/R2%20Score-0.7956-blue)
+![RMSE](https://img.shields.io/badge/RMSE-18.62%20cycles-orange)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 ![Tests](https://img.shields.io/badge/Tests-18%2F18%20Passed-brightgreen)
 
@@ -98,11 +98,12 @@ PredictiveSense-AI/
 │   ├── test_pipeline.py            # Unit tests (10/10 passed)
 │   └── test_integration.py         # Integration tests (8/8 passed)
 ├── reports/
-│   ├── SRS_v1.0.docx               # Software Requirements Specification
+│   ├── SRS_v2.0.docx               # Software Requirements Specification (latest)
 │   ├── cv_results.png              # Cross-validation results plot
 │   └── feature_importance_optimised.png
 ├── screenshots/                    # Dashboard screenshots
 ├── Dockerfile                      # Docker containerisation
+├── run.bat                         # One-click Windows launcher
 ├── .gitignore
 ├── requirements.txt
 └── README.md
@@ -121,6 +122,7 @@ PredictiveSense-AI/
 | Matplotlib & Seaborn | EDA visualizations | ✅ |
 | pytest | Automated unit & integration testing | ✅ |
 | Docker | Containerisation & deployment | ✅ |
+| smtplib (Gmail SMTP) | Automated email alerts | ✅ |
 | Git LFS | Large model file version control | ✅ |
 
 ---
@@ -171,6 +173,16 @@ PredictiveSense-AI/
 | 🟢 HEALTHY | RUL > 80 cycles | Green | Normal operation |
 | 🟡 WARNING | RUL 40–80 cycles | Yellow | Schedule maintenance |
 | 🔴 CRITICAL | RUL < 40 cycles | Red | Immediate action required |
+
+---
+
+## 📧 Email Alert System
+Automated email notifications sent via Gmail SMTP whenever an engine enters a WARNING or CRITICAL state.
+
+- **Trigger:** CRITICAL (RUL < 40) and WARNING (RUL 40–80) states
+- **Delivery:** Formatted HTML email — red for CRITICAL, orange for WARNING
+- **Recipient:** Configurable from the dashboard, persists across restarts (`config.txt`)
+- **Sender:** `predictivesense.ai@gmail.com` (Gmail App Password)
 
 ---
 
@@ -228,6 +240,8 @@ pip install -r requirements.txt
 streamlit run dashboard/app.py
 ```
 
+**Windows users:** just double-click `run.bat` — it activates the virtual environment and launches the dashboard automatically, no commands needed.
+
 Dashboard runs at: **http://localhost:8501**
 Live Demo: **https://predictivesense-ai.streamlit.app**
 
@@ -251,16 +265,20 @@ Live Demo: **https://predictivesense-ai.streamlit.app**
 - [x] Day 27 — Docker Containerisation
 - [x] Day 28-29 — Integration Tests + Code Documentation
 - [x] Day 30 — Streamlit Cloud Live Deployment 🌐
+- [x] Day 31 — Automated Email Alert System (Gmail SMTP)
+- [x] Day 34 — run.bat One-Click Launcher
+- [x] Day 37 — SRS Document v2.0 Update
+- [x] Day 38 — README Final Polish
 
 ### Upcoming ⏳
-- [ ] Final Report & Presentation
+- [ ] Final Presentation (PPT) & Final Report (PDF) — pending mentor review meeting
 - [ ] Project Submission — 17 July 2026
 
 ---
 
 ## 📄 Documentation
 - **Live Dashboard:** [predictivesense-ai.streamlit.app](https://predictivesense-ai.streamlit.app)
-- **SRS Document:** `reports/SRS_v1.0.docx`
+- **SRS Document:** `reports/SRS_v2.0.docx`
 - **Notebooks:** Step-by-step ML pipeline in `notebooks/`
 - **Weekly Reports:** Submitted every Sunday to DRDO mentor
 
