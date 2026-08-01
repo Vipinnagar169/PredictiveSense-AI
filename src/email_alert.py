@@ -7,16 +7,19 @@ DRDO Internship 2026 | Vipin Nagar
 """
 
 import os
+from pathlib import Path
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()  # Loads variables from a local .env file (local/Docker use only)
-except ImportError:
-    pass  # python-dotenv not installed — fine if the variable is set another way
+from dotenv import load_dotenv
+
+# Explicitly point to the .env file at the project root (src/ -> parent = root)
+# This works no matter where you run streamlit/python from.
+BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_PATH = BASE_DIR / ".env"
+load_dotenv(dotenv_path=ENV_PATH)
 
 # ── Sender Configuration ──────────────────────────────────────────
 SENDER_EMAIL    = os.environ.get("GMAIL_SENDER_EMAIL", "predictivesense.ai@gmail.com")
@@ -26,8 +29,8 @@ SMTP_PORT       = 587
 
 if not SENDER_PASSWORD:
     raise RuntimeError(
-        "GMAIL_APP_PASSWORD not set. Add it to a local .env file "
-        "(GMAIL_APP_PASSWORD=your-app-password) before running locally or in Docker."
+        f"GMAIL_APP_PASSWORD not set. Looked for .env at: {ENV_PATH} "
+        f"(exists: {ENV_PATH.exists()}). Add GMAIL_APP_PASSWORD=your-app-password to it."
     )
 
 def send_critical_alert(engine_id, predicted_rul, anomaly_count, receiver_email, sensor_value=None, sensor_name="sensor_11"):
