@@ -6,28 +6,41 @@ Sends email when engine RUL drops below critical threshold (40 cycles).
 DRDO Internship 2026 | Vipin Nagar
 """
 
+import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # Loads variables from a local .env file (local/Docker use only)
+except ImportError:
+    pass  # python-dotenv not installed — fine if the variable is set another way
+
 # ── Sender Configuration ──────────────────────────────────────────
-SENDER_EMAIL    = "predictivesense.ai@gmail.com"
-SENDER_PASSWORD = "zlqg fhou xgwp wvqc"
+SENDER_EMAIL    = os.environ.get("GMAIL_SENDER_EMAIL", "predictivesense.ai@gmail.com")
+SENDER_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD")
 SMTP_SERVER     = "smtp.gmail.com"
 SMTP_PORT       = 587
+
+if not SENDER_PASSWORD:
+    raise RuntimeError(
+        "GMAIL_APP_PASSWORD not set. Add it to a local .env file "
+        "(GMAIL_APP_PASSWORD=your-app-password) before running locally or in Docker."
+    )
 
 def send_critical_alert(engine_id, predicted_rul, anomaly_count, receiver_email, sensor_value=None, sensor_name="sensor_11"):
     """
     Send critical alert email when engine RUL is below threshold.
-    
+
     Args:
         engine_id (int)       : Engine unit ID (1-100)
         predicted_rul (float) : Predicted Remaining Useful Life in cycles
         anomaly_count (int)   : Number of anomalies detected for this engine
         receiver_email (str)  : Engineer's email address to send alert to
         sensor_value (float)  : Last reading of sensor_11 (critical sensor)
-    
+
     Returns:
         bool: True if email sent successfully, False otherwise
     """
@@ -38,7 +51,6 @@ def send_critical_alert(engine_id, predicted_rul, anomaly_count, receiver_email,
         msg['To']      = receiver_email
 
         timestamp = datetime.now().strftime("%d %B %Y, %I:%M %p")
-
         sensor_row = f"{sensor_value:.4f} (normalized)" if sensor_value is not None else "N/A"
 
         text = f"""
@@ -122,13 +134,13 @@ Please take immediate action to inspect Engine #{engine_id}.
 def send_warning_alert(engine_id, predicted_rul, receiver_email, sensor_value=None):
     """
     Send warning alert email when engine RUL is between 40-80 cycles.
-    
+
     Args:
         engine_id (int)       : Engine unit ID (1-100)
         predicted_rul (float) : Predicted Remaining Useful Life in cycles
         receiver_email (str)  : Engineer's email address
         sensor_value (float)  : Last reading of sensor_11 (critical sensor)
-    
+
     Returns:
         bool: True if email sent successfully, False otherwise
     """
