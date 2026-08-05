@@ -5,3 +5,7 @@ __pycache__/
 data/raw/
 config.txt
 .env
+
+# Large unused models - not needed by dashboard (keep local only)
+models/rf_model.pkl
+models/rf_improved.pkl
