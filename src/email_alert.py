@@ -28,9 +28,10 @@ SMTP_SERVER     = "smtp.gmail.com"
 SMTP_PORT       = 587
 
 if not SENDER_PASSWORD:
-    raise RuntimeError(
+    import warnings
+    warnings.warn(
         f"GMAIL_APP_PASSWORD not set. Looked for .env at: {ENV_PATH} "
-        f"(exists: {ENV_PATH.exists()}). Add GMAIL_APP_PASSWORD=your-app-password to it."
+        f"(exists: {ENV_PATH.exists()}). Email alerts will be disabled."
     )
 
 def send_critical_alert(engine_id, predicted_rul, anomaly_count, receiver_email, sensor_value=None, sensor_name="sensor_11"):
@@ -47,6 +48,9 @@ def send_critical_alert(engine_id, predicted_rul, anomaly_count, receiver_email,
     Returns:
         bool: True if email sent successfully, False otherwise
     """
+    if not SENDER_PASSWORD:
+        print("Email alert skipped: GMAIL_APP_PASSWORD not set.")
+        return False
     try:
         msg = MIMEMultipart("alternative")
         msg['Subject'] = f"🔴 CRITICAL ALERT — Engine #{engine_id} | PredictiveSense AI"
@@ -147,6 +151,9 @@ def send_warning_alert(engine_id, predicted_rul, receiver_email, sensor_value=No
     Returns:
         bool: True if email sent successfully, False otherwise
     """
+    if not SENDER_PASSWORD:
+        print("Email alert skipped: GMAIL_APP_PASSWORD not set.")
+        return False
     try:
         msg = MIMEMultipart("alternative")
         msg['Subject'] = f"🟡 WARNING — Engine #{engine_id} | PredictiveSense AI"
